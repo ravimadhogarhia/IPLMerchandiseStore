@@ -2,8 +2,10 @@
 using IPLMerchandise.Application.Interfaces;
 using IPLMerchandise.Domain.Entities;
 using IPLMerchandise.Domain.Enums;
+using IPLMerchandise.Infrastructure.Configuration;
 using IPLMerchandise.Infrastructure.Documents;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Options;
 
 namespace IPLMerchandise.Infrastructure.Repositories;
 
@@ -11,10 +13,12 @@ public sealed class CosmosProductRepository : IProductRepository
 {
     private readonly Container _container;
 
-    public CosmosProductRepository(CosmosClient client)
+    public CosmosProductRepository(
+    CosmosClient client,
+    IOptions<CosmosDbOptions> options)
     {
         _container = client.GetContainer(
-            "IplMerchandiseDb",
+            options.Value.DatabaseName,
             "Products");
     }
 

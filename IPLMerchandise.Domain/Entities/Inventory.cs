@@ -17,4 +17,5 @@ public sealed class Inventory
 
     public int InStockQuantity =>
         AvailableQuantity - ReservedQuantity;
+    public string? ETag { get; set; }
 }

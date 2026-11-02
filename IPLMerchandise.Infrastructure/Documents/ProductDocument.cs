@@ -1,47 +1,49 @@
-﻿using System.Text.Json.Serialization;
+﻿
 using IPLMerchandise.Domain.Enums;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace IPLMerchandise.Infrastructure.Documents;
 
 public sealed class ProductDocument
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = string.Empty;
 
-    [JsonPropertyName("documentType")]
+    [JsonProperty("documentType")]
     public string DocumentType { get; set; } = "Product";
 
-    [JsonPropertyName("franchiseId")]
+    [JsonProperty("franchiseId")]
     public string FranchiseId { get; set; } = string.Empty;
 
-    [JsonPropertyName("name")]
+    [JsonProperty("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonPropertyName("description")]
+    [JsonProperty("description")]
     public string Description { get; set; } = string.Empty;
 
-    [JsonPropertyName("franchiseName")]
+    [JsonProperty("franchiseName")]
     public string FranchiseName { get; set; } = string.Empty;
 
-    [JsonPropertyName("category")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonProperty("category")]
+    [JsonConverter(typeof(StringEnumConverter))]
     public ProductCategory Category { get; set; }
 
-    [JsonPropertyName("price")]
+    [JsonProperty("price")]
     public decimal Price { get; set; }
 
-    [JsonPropertyName("currency")]
+    [JsonProperty("currency")]
     public string Currency { get; set; } = "INR";
 
-    [JsonPropertyName("imageUrl")]
+    [JsonProperty("imageUrl")]
     public string ImageUrl { get; set; } = string.Empty;
 
-    [JsonPropertyName("isActive")]
+    [JsonProperty("isActive")]
     public bool IsActive { get; set; } = true;
 
-    [JsonPropertyName("createdAtUtc")]
+    [JsonProperty("createdAtUtc")]
     public DateTime CreatedAtUtc { get; set; }
 
-    [JsonPropertyName("updatedAtUtc")]
+    [JsonProperty("updatedAtUtc")]
     public DateTime UpdatedAtUtc { get; set; }
 }

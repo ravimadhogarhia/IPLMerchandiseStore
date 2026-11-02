@@ -31,7 +31,12 @@ public sealed class CosmosInventoryRepository : IInventoryRepository
                 new PartitionKey(franchiseId),
                 cancellationToken: cancellationToken);
 
-            return MapToDomain(response.Resource);
+            var inventory = MapToDomain(response.Resource);
+
+            // Capture Cosmos DB system ETag.
+            inventory.ETag = response.ETag;
+
+            return inventory;
         }
         catch (CosmosException ex)
             when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -46,13 +51,48 @@ public sealed class CosmosInventoryRepository : IInventoryRepository
     {
         var document = MapToDocument(inventory);
 
-        await _container.UpsertItemAsync(
-            document,
-            new PartitionKey(inventory.FranchiseId),
-            cancellationToken: cancellationToken);
+        try
+        {
+            ItemResponse<InventoryDocument> response;
+
+            if (string.IsNullOrWhiteSpace(inventory.ETag))
+            {
+                // New inventory document.
+                response = await _container.CreateItemAsync(
+                    document,
+                    new PartitionKey(inventory.FranchiseId),
+                    cancellationToken: cancellationToken);
+            }
+            else
+            {
+                // Update only if the stored ETag still matches.
+                response = await _container.ReplaceItemAsync(
+                    document,
+                    inventory.Id,
+                    new PartitionKey(inventory.FranchiseId),
+                    new ItemRequestOptions
+                    {
+                        IfMatchEtag = inventory.ETag
+                    },
+                    cancellationToken);
+            }
+
+            // Store the latest ETag for the next update.
+            inventory.ETag = response.ETag;
+        }
+        catch (CosmosException ex)
+            when (ex.StatusCode == System.Net.HttpStatusCode.PreconditionFailed ||
+                  ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            throw new InvalidOperationException(
+                "Inventory was modified by another request. " +
+                "Reload the inventory and retry the operation.",
+                ex);
+        }
     }
 
-    private static Inventory MapToDomain(InventoryDocument document)
+    private static Inventory MapToDomain(
+        InventoryDocument document)
     {
         return new Inventory
         {
@@ -65,7 +105,8 @@ public sealed class CosmosInventoryRepository : IInventoryRepository
         };
     }
 
-    private static InventoryDocument MapToDocument(Inventory inventory)
+    private static InventoryDocument MapToDocument(
+        Inventory inventory)
     {
         return new InventoryDocument
         {
@@ -78,3 +119,4 @@ public sealed class CosmosInventoryRepository : IInventoryRepository
         };
     }
 }
+

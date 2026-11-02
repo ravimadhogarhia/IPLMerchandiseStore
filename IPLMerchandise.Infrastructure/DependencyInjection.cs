@@ -1,13 +1,13 @@
 ﻿
+using IPLMerchandise.Application.Interfaces;
+using IPLMerchandise.Application.Services;
 using IPLMerchandise.Infrastructure.Configuration;
 using IPLMerchandise.Infrastructure.Persistence;
+using IPLMerchandise.Infrastructure.Repositories;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
-using IPLMerchandise.Application.Interfaces;
-using IPLMerchandise.Application.Services;
-using IPLMerchandise.Infrastructure.Repositories;
 
 namespace IPLMerchandise.Infrastructure;
 
@@ -40,6 +40,12 @@ public static class DependencyInjection
         services.AddScoped<ICartService, CartService>();
         services.AddScoped<IInventoryRepository, CosmosInventoryRepository>();
         services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<IOrderRepository, CosmosOrderRepository>();
+        services.AddScoped<IOrderService, OrderService>();
+        services.AddScoped<IPaymentService, MockPaymentService>();
+        services.AddScoped<
+    IInventoryReservationService,
+    InventoryReservationService>();
 
         services.AddSingleton(_ => new CosmosClient(
             options.Endpoint,

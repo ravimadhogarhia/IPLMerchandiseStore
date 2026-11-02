@@ -79,7 +79,8 @@ public sealed class ProductService : IProductService
             Category = product.Category,
             Price = product.Price,
             Currency = product.Currency,
-            ImageUrl = product.ImageUrl
+            ImageUrl = product.ImageUrl,
+            IsActive = product.IsActive
         };
     }
 }

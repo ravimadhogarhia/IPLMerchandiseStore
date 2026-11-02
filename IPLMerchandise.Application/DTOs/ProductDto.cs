@@ -21,4 +21,6 @@ public sealed class ProductDto
     public string Currency { get; set; } = "INR";
 
     public string ImageUrl { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+
 }
