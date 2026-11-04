@@ -2,9 +2,12 @@
 using IPLMerchandise.Application.DTOs.Carts;
 using IPLMerchandise.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace IPLMerchandise.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/customers/{customerId}/cart")]
 public sealed class CartController : ControllerBase
@@ -22,6 +25,10 @@ public sealed class CartController : ControllerBase
         string customerId,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var result = await _cartService.GetCartAsync(
             customerId,
             cancellationToken);
@@ -36,6 +43,10 @@ public sealed class CartController : ControllerBase
         [FromBody] AddToCartRequest request,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var result = await _cartService.AddItemAsync(
             customerId,
             request,
@@ -53,6 +64,10 @@ public sealed class CartController : ControllerBase
         [FromBody] UpdateCartItemRequest request,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var result = await _cartService.UpdateItemAsync(
             customerId,
             franchiseId,
@@ -71,6 +86,10 @@ public sealed class CartController : ControllerBase
         string productId,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         await _cartService.RemoveItemAsync(
             customerId,
             franchiseId,
@@ -78,5 +97,17 @@ public sealed class CartController : ControllerBase
             cancellationToken);
 
         return NoContent();
+    }
+
+    private bool IsCurrentCustomer(string customerId)
+    {
+        var authenticatedUserId =
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        return !string.IsNullOrWhiteSpace(authenticatedUserId)
+            && string.Equals(
+                authenticatedUserId,
+                customerId,
+                StringComparison.Ordinal);
     }
 }

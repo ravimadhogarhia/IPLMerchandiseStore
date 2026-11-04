@@ -1,9 +1,8 @@
 
+import { apiRequest } from "./apiClient";
 import type { Product, PagedResult } from "../types/product";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-export interface ProductSearchParams {
+interface ProductFilters {
   franchiseId?: string;
   category?: string;
   search?: string;
@@ -11,23 +10,25 @@ export interface ProductSearchParams {
 }
 
 export async function getProducts(
-  params: ProductSearchParams = {}
+  filters: ProductFilters = {}
 ): Promise<PagedResult<Product>> {
-  const query = new URLSearchParams();
+  const params = new URLSearchParams();
 
-  if (params.franchiseId) query.set("franchiseId", params.franchiseId);
-  if (params.category) query.set("category", params.category);
-  if (params.search) query.set("search", params.search);
-
-  query.set("pageSize", String(params.pageSize ?? 20));
-
-  const response = await fetch(
-    `${API_BASE_URL}/api/products?${query.toString()}`
-  );
-
-  if (!response.ok) {
-    throw new Error(`Unable to load products. HTTP ${response.status}`);
+  if (filters.franchiseId) {
+    params.set("franchiseId", filters.franchiseId);
   }
 
-  return response.json() as Promise<PagedResult<Product>>;
+  if (filters.category) {
+    params.set("category", filters.category);
+  }
+
+  if (filters.search) {
+    params.set("search", filters.search);
+  }
+
+  params.set("pageSize", String(filters.pageSize ?? 100));
+
+  return apiRequest<PagedResult<Product>>(
+    `/api/products?${params.toString()}`
+  );
 }

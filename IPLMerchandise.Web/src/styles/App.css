@@ -624,4 +624,104 @@ footer {
   font-size: 12px;
   font-weight: 800;
 }
+.auth-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-user {
+  font-weight: 600;
+}
+
+.logout-button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #d62828;
+  color: white;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: #a91f1f;
+}
+
+.login-status {
+  font-size: 14px;
+  color: #777;
+}
+.login-button {
+  padding: 9px 20px;
+  background: #1565c0;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.login-button:hover {
+  background: #0d47a1;
+}
+.auth-container {
+  display: flex;
+  justify-content: center;
+  padding: 50px 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.auth-card label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.auth-card > button[type="submit"] {
+  width: 100%;
+  margin-top: 22px;
+  padding: 12px;
+  background: #1565c0;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.auth-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-error {
+  color: #b00020;
+  margin: 12px 0;
+}
+
+.auth-success {
+  color: #16803c;
+  margin: 12px 0;
+}
 

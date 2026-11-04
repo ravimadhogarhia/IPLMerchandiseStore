@@ -1,10 +1,14 @@
 ﻿using IPLMerchandise.Application.DTOs.Orders;
 using IPLMerchandise.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace IPLMerchandise.Api.Controllers;
-
+[Authorize]
 [ApiController]
+[EnableRateLimiting("ApiPolicy")]
 [Route("api/customers/{customerId}/orders")]
 public sealed class OrderController : ControllerBase
 {
@@ -20,11 +24,16 @@ public sealed class OrderController : ControllerBase
     [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [EnableRateLimiting("CheckoutPolicy")]
     public async Task<IActionResult> Checkout(
         string customerId,
         [FromBody] CheckoutRequest request,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var order = await _orderService.CheckoutAsync(
             customerId,
             request,
@@ -49,6 +58,10 @@ public sealed class OrderController : ControllerBase
         string orderId,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var order = await _orderService.GetOrderAsync(
             customerId,
             orderId,
@@ -64,6 +77,10 @@ public sealed class OrderController : ControllerBase
         string customerId,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var orders = await _orderService.GetCustomerOrdersAsync(
             customerId,
             cancellationToken);
@@ -83,6 +100,10 @@ public sealed class OrderController : ControllerBase
         [FromBody] PaymentRequest request,
         CancellationToken cancellationToken)
     {
+        if (!IsCurrentCustomer(customerId))
+        {
+            return Forbid();
+        }
         var order = await _orderService.ProcessPaymentAsync(
             customerId,
             orderId,
@@ -90,5 +111,17 @@ public sealed class OrderController : ControllerBase
             cancellationToken);
 
         return Ok(order);
+    }
+
+    private bool IsCurrentCustomer(string customerId)
+    {
+        var authenticatedUserId =
+            User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        return !string.IsNullOrWhiteSpace(authenticatedUserId)
+            && string.Equals(
+                authenticatedUserId,
+                customerId,
+                StringComparison.Ordinal);
     }
 }

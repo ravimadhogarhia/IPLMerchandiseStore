@@ -18,6 +18,8 @@ public sealed class ApiExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
+
+
         var (statusCode, title, detail) = exception switch
         {
             ArgumentException ex => (
@@ -33,6 +35,10 @@ public sealed class ApiExceptionHandler : IExceptionHandler
             InvalidOperationException ex => (
                 StatusCodes.Status409Conflict,
                 "Operation conflict",
+                ex.Message),
+            UnauthorizedAccessException ex => (
+                StatusCodes.Status401Unauthorized,
+                "Unauthorized",
                 ex.Message),
 
             _ => (

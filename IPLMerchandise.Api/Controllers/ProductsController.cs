@@ -1,11 +1,12 @@
 ﻿using IPLMerchandise.Application.Interfaces;
 using IPLMerchandise.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.RateLimiting;
 namespace IPLMerchandise.Api.Controllers;
 
 [ApiController]
 [Route("api/products")]
+[EnableRateLimiting("ApiPolicy")]
 public sealed class ProductsController : ControllerBase
 {
     private readonly IProductService _productService;

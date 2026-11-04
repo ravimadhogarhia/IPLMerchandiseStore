@@ -4,6 +4,7 @@ using IPLMerchandise.Application.Services;
 using IPLMerchandise.Infrastructure.Configuration;
 using IPLMerchandise.Infrastructure.Persistence;
 using IPLMerchandise.Infrastructure.Repositories;
+using IPLMerchandise.Infrastructure.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +34,10 @@ public static class DependencyInjection
 
         services.Configure<CosmosDbOptions>(
             configuration.GetSection(CosmosDbOptions.SectionName));
+        services.Configure<JwtOptions>(
+            configuration.GetSection(JwtOptions.SectionName));
+
+        services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IProductRepository, CosmosProductRepository>();
 
         services.AddScoped<IProductService, ProductService>();
@@ -43,6 +48,8 @@ public static class DependencyInjection
         services.AddScoped<IOrderRepository, CosmosOrderRepository>();
         services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IPaymentService, MockPaymentService>();
+        services.AddScoped<IUserRepository, CosmosUserRepository>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<
     IInventoryReservationService,
     InventoryReservationService>();

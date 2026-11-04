@@ -47,6 +47,12 @@ public sealed class CosmosDbInitializer : IHostedService
                 cancellationToken: cancellationToken);
         }
 
+        await database.CreateContainerIfNotExistsAsync(
+    id: "Users",
+    partitionKeyPath: "/id",
+    throughput: 400,
+    cancellationToken: cancellationToken);
+
         await SeedProductsAsync(
             _client.GetContainer(_options.DatabaseName, "Products"),cancellationToken);
 
